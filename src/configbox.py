@@ -17,7 +17,7 @@ Configuration window for Tunesviewer.
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  GNU General Public License for more details.
 """
-import ConfigParser
+import configparser
 import logging
 import os
 
@@ -216,7 +216,7 @@ class ConfigBox:
 		"filetype:program".
 		"""
 		out = ""
-		for key, value in opener.items():
+		for key, value in list(opener.items()):
 			out += key + ":" + value + "\n"
 		return out
 
@@ -253,7 +253,7 @@ class ConfigBox:
 			logging.warn("Couldn't convert icon size: " + str(e))
 
 		#Then write config file:
-		config = ConfigParser.ConfigParser()
+		config = configparser.ConfigParser()
 		sec = "TunesViewerPrefs"
 		config.add_section(sec)
 		config.set(sec, "DefaultMode", self.defaultcommand)
@@ -299,9 +299,9 @@ class ConfigBox:
 		logging.debug("Loading Prefs")
 		first = False
 		if os.path.isfile(PREFS_FILE):
-			try:
+			#try:
 				#Load to the main variables:
-				config = ConfigParser.ConfigParser()
+				config = configparser.ConfigParser()
 				config.read(PREFS_FILE)
 				sec = "TunesViewerPrefs"
 				self.defaultcommand = config.get(sec, "DefaultMode")
@@ -310,7 +310,7 @@ class ConfigBox:
 				if os.path.isdir(folder):
 					self.downloadfolder = folder
 				else:
-					logging.debug("Not a valid directory: %s" % folder)
+					logging.debug("Not a valid directory: {0:s}".format(folder))
 				self.downloadfile = config.get(sec, "DownloadFile")
 				self.downloadsafe = (config.get(sec, "DownloadSafeFilename") == "True")
 				self.notifyseconds = int(config.get(sec, "NotifySeconds"))
@@ -325,8 +325,8 @@ class ConfigBox:
 				self.modifiedCol = (config.get(sec, "modifiedCol") == "True")
 				self.zoomAll = (config.get(sec, "zoomAll") == "True")
 				self.mainwin.descView.set_zoom_level(float(config.get(sec, "zoom")))
-			except Exception as e:
-				logging.warn("Load-settings error: " + str(e))
+			#except Exception as e:
+			#	logging.warn("Load-settings error: " + str(e))
 		else:
 			first = True
 

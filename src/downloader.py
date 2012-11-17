@@ -18,11 +18,11 @@ A class to handle a single download.
  GNU General Public License for more details.
 """
 
-import httplib
+import http.client
 import logging
 import os
 import time
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 
 from threading import Thread
 
@@ -238,7 +238,7 @@ class Downloader:
 					#File already exists, start where it left off:
 					#This seems to corrupt the file sometimes?
 					self._netfile.close()
-					req = urllib2.Request(self.url)
+					req = urllib.request.Request(self.url)
 					logging.debug("File downloading at byte: %d." % self.count)
 					req.add_header("Range", "bytes=%s-" % (self.count))
 					self._netfile = self.opener.open(req)
@@ -254,7 +254,7 @@ class Downloader:
 						self._outfile.write(next)
 						self.count += len(next)
 					self.success = True
-			except httplib.InvalidURL as e:
+			except http.client.InvalidURL as e:
 				self.Err = ("Invalid url. " + str(e))
 				logging.warn("Error: " + str(e))
 				if str(e).count("nonnumeric port"):

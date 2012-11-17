@@ -70,7 +70,7 @@ class SingleWindowSocket:
 		"""
 		s = socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM)
 		s.connect(DATA_SOCKET)
-		s.send(url)
+		s.send(url.encode('UTF-8'))
 		s.close()
 
 	def server(self):

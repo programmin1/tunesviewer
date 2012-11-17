@@ -20,7 +20,7 @@ Common functions for Tunesviewer.
 import logging
 import os.path
 import re
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 
 from gi.repository import GLib as glib
 from gi.repository import Gtk as gtk
@@ -68,8 +68,8 @@ def htmlentitydecode(s):
 		# what we have so far.
 		#
 		# See: hg.python.org/cpython/file/2.7/Lib/HTMLParser.py
-		import HTMLParser
-		return HTMLParser.HTMLParser().unescape(s).replace("&apos;", "'")
+		import html.parser
+		return html.parser.HTMLParser().unescape(s).replace("&apos;", "'")
 	else:
 		return ""
 
@@ -174,7 +174,7 @@ def super_unquote(s):
 
 	while old_s != new_s:
 		old_s = new_s
-		new_s = urllib2.unquote(old_s)
+		new_s = urllib.parse.unquote(old_s)
 
 	return new_s
 

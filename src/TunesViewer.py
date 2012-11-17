@@ -21,17 +21,17 @@ A small, easy-to-use tool to access iTunesU and podcast media.
 """
 
 # Import standard Python modules
-import cookielib
+import http.cookiejar
 import gzip
 import logging
 import os
 import socket
 import subprocess
 import time
-import urllib
-import urllib2
+import urllib.request, urllib.parse, urllib.error
+import urllib.request, urllib.error, urllib.parse
 
-from StringIO import StringIO
+from io import StringIO
 from threading import Thread
 
 # Import third-party modules (GTK and siblings for GUI)
@@ -709,8 +709,8 @@ class TunesViewer:
 		self.config = ConfigBox(self) # Only one configuration box, it has reference back to here to change toolbar,statusbar settings.
 
 		# Set up the main url handler with downloading and cookies:
-		self.cj = cookielib.CookieJar()
-		self.opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(self.cj))
+		self.cj = http.cookiejar.CookieJar()
+		self.opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(self.cj))
 		self.opener.addheaders = [('User-agent', self.descView.ua),
 					  ('Accept-Encoding', 'gzip'),
 					  ('Accept-Language', 'en-US')]
@@ -806,7 +806,7 @@ class TunesViewer:
 				url = data.data
 			else:
 				try:
-					url = unicode(data.data, "utf-16")
+					url = str(data.data, "utf-16")
 				except:
 					logging.warn("Couldn't decode the data grabbed.")
 					url = ""
@@ -824,7 +824,7 @@ class TunesViewer:
 			widget.currentFound += 1
 			if widget.currentFound >= len(self.liststore):
 				msg = gtk.MessageDialog(widget,
-							gtk.DIALOG_MODAL,
+							gtk.DialogFlags.MODAL,
 							gtk.MESSAGE_INFO,
 							gtk.BUTTONS_OK,
 							"End of page.")
@@ -901,9 +901,9 @@ class TunesViewer:
 
 	def showAbout(self, obj):
 		msg = gtk.MessageDialog(self.window,
-					gtk.DIALOG_MODAL,
+					gtk.DialogFlags.MODAL,
 					gtk.MESSAGE_INFO,
-					gtk.BUTTONS_CLOSE,
+					gtk.ButtonsType.CLOSE,
 					"TunesViewer - Easy iTunesU access\n"
 					"Version %s\n\n"
 					"(C) 2009 - 2012 Luke Bryan\n"
@@ -922,9 +922,9 @@ class TunesViewer:
 	def viewCookie(self, obj):
 		cList = []
 		logging.debug(self.cj._cookies)
-		for k in self.cj._cookies.keys():
+		for k in list(self.cj._cookies.keys()):
 			cList.append(k)
-			for k2 in self.cj._cookies[k].keys():
+			for k2 in list(self.cj._cookies[k].keys()):
 				cList.append("   " + k2)
 				for k3 in self.cj._cookies[k][k2]:
 					cList.append("      " + k3 + " = " +
@@ -956,9 +956,9 @@ class TunesViewer:
 			subprocess.Popen(cmds)
 		except OSError as e:
 			msg = gtk.MessageDialog(self.window,
-						gtk.DIALOG_MODAL,
+						gtk.DialogFlags.MODAL,
 						gtk.MESSAGE_WARNING,
-						gtk.BUTTONS_CLOSE,
+						gtk.ButtonsType.CLOSE,
 						"Error running: %s\n\n"
 						"Is the program installed and working?\n%s" % (" ".join(cmds), e))
 			msg.run()
@@ -1106,18 +1106,18 @@ class TunesViewer:
 			start(self.config.openers[kind], url)
 		elif url == "":
 			msg = gtk.MessageDialog(self.window,
-						gtk.DIALOG_MODAL,
+						gtk.DialogFlags.MODAL,
 						gtk.MESSAGE_WARNING,
-						gtk.BUTTONS_CLOSE,
+						gtk.ButtonsType.CLOSE,
 						"This item is not a file.")
 			msg.run()
 			msg.destroy()
 			return
 		else:
 			msg = gtk.MessageDialog(self.window,
-						gtk.DIALOG_MODAL,
+						gtk.DialogFlags.MODAL,
 						gtk.MESSAGE_WARNING,
-						gtk.BUTTONS_CLOSE,
+						gtk.ButtonsType.CLOSE,
 						"You don't have any program set to open " +
 						kind +
 						"\nfiles directly from the web. "
@@ -1166,9 +1166,9 @@ class TunesViewer:
 		url = properties[9]
 		if url == "":
 			msg = gtk.MessageDialog(self.window,
-						gtk.DIALOG_MODAL,
+						gtk.DialogFlags.MODAL,
 						gtk.MESSAGE_WARNING,
-						gtk.BUTTONS_CLOSE,
+						gtk.ButtonsType.CLOSE,
 						"This item is not a file.")
 			msg.run()
 			msg.destroy()
@@ -1245,7 +1245,7 @@ class TunesViewer:
 		self.config.save_settings()
 		if self.downloadbox.downloadrunning:
 			msg = gtk.MessageDialog(self.window,
-						gtk.DIALOG_MODAL,
+						gtk.DialogFlags.MODAL,
 						gtk.MESSAGE_QUESTION,
 						gtk.BUTTONS_YES_NO,
 						"Are you sure you want to exit? "
@@ -1296,8 +1296,8 @@ class TunesViewer:
 		"""
 		oldurl = self.url # previous url, to add to back stack.
 		if url.startswith("download://"):
-			logging.debug("DOWNLOAD:// interface called with xml:"+urllib.unquote(url))
-			xml = urllib.unquote(url)[11:]
+			logging.debug("DOWNLOAD:// interface called with xml:"+urllib.parse.unquote(url))
+			xml = urllib.parse.unquote(url)[11:]
 			dom = etree.fromstring(xml)
 			keys = dom.xpath("//key")
 			name = ""
@@ -1307,7 +1307,7 @@ class TunesViewer:
 			comment = ""
 			url = ""
 			for key in keys:
-				print key.text, key.getnext().text
+				print((key.text, key.getnext().text))
 				if key.text == "navbar":
 					return
 				if key.text == "URL" and key.getnext() is not None:
@@ -1323,7 +1323,7 @@ class TunesViewer:
 			self.downloadFile(name, artist, duration, extType, comment, url)
 			return
 		elif url.startswith("copyurl://"):
-			tocopy = urllib.unquote(url[10:].replace("[http:]","http:").replace("[https:]","https:"))
+			tocopy = urllib.parse.unquote(url[10:].replace("[http:]","http:").replace("[https:]","https:"))
 			gtk.Clipboard().set_text(tocopy)
 			logging.debug("copied "+tocopy)
 			return
@@ -1335,7 +1335,7 @@ class TunesViewer:
 			return
 		# Fix url based on http://bugs.python.org/issue918368
 		try:
-			url = urllib.quote(url, safe="%/:=&?~#+!$,;'@()*[]")
+			url = urllib.parse.quote(url, safe="%/:=&?~#+!$,;'@()*[]")
 		except KeyError:
 			#A workaround for bad input: http://bugs.python.org/issue1712522
 			logging.warn("Error: unexpected input, " + url)
@@ -1347,7 +1347,7 @@ class TunesViewer:
 		#Fix page-link:
 		if url.startswith("http://www.apple.com/itunes/affiliates/download/"):
 			if url.find("Url=") > -1:
-				url = urllib.unquote(url[url.find("Url=") + 4:])
+				url = urllib.parse.unquote(url[url.find("Url=") + 4:])
 			else:
 				logging.debug("Dead end page")
 
@@ -1437,9 +1437,9 @@ class TunesViewer:
 			pass #just exited, don't crash.
 		if self.downloadError != "": #Warn if there is an error:
 			msg = gtk.MessageDialog(self.window,
-						gtk.DIALOG_MODAL,
-						gtk.MESSAGE_ERROR,
-						gtk.BUTTONS_CLOSE,
+						gtk.DialogFlags.MODAL,
+						gtk.MessageType.ERROR,
+						gtk.ButtonsType.CLOSE,
 						str(self.downloadError))
 			msg.run()
 			msg.destroy()
@@ -1652,23 +1652,23 @@ def parse_cli():
 		url = ''
 
 	if opts.version:
-		print ("TunesViewer " + TV_VERSION)
+		print(("TunesViewer " + TV_VERSION))
 		import sys
 		sys.exit(0)
 	if opts.verbose:
 		logging.basicConfig(level=logging.DEBUG)
 	if opts.download:
 		if url:
-			opener = urllib2.build_opener()
+			opener = urllib.request.build_opener()
 			opener.addheaders = [('User-agent', USER_AGENT)]
 			text = opener.open(url).read()
 			parsed = Parser(url, "text/HTML", text)
 			open(opts.download,'w').write(parsed.HTML)
-			print "Wrote file to",opts.download
+			print(("Wrote file to",opts.download))
 			import sys
 			sys.exit(0)
 		else:
-			print "No url specified. Starting normally."
+			print ("No url specified. Starting normally.")
 
 	return url
 
@@ -1686,7 +1686,7 @@ if __name__ == "__main__":
 			prog.url = url
 			prog.main()
 		except KeyboardInterrupt:
-			print "Keyboard Interrupt, exiting."
+			print("Keyboard Interrupt, exiting.")
 			prog.exitclicked(None)
 	else:
 		logging.info("Sending url to already-running window.")

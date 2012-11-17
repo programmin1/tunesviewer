@@ -73,7 +73,7 @@ class WebKitView(webkit.WebView):
 		self.connect("new-window-policy-decision-requested", self.newWin) #requires webkit 1.1.4
 		self.connect("download-requested", self.downloadReq)
 		current = os.path.dirname(os.path.realpath(__file__))
-		self.injectJavascript = file(os.path.join(current, "Javascript.js"),
+		self.injectJavascript = open(os.path.join(current, "Javascript.js"),
 					     "r").read()
 
 	def webKitLoaded(self, view, frame):
