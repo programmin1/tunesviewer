@@ -1,3 +1,18 @@
+tunesviewer (1.5.99.0-1~1.gbp364408) UNRELEASED; urgency=low
+
+  ** SNAPSHOT build @3644089984d3ff169c47b0a626d1e7b67fa9468d **
+
+  * First snapshot of version with support for GTK3.
+  * debian/control: Add dependency on webkit introspection.
+
+ -- Rogério Brito <rbrito@ime.usp.br>  Sun, 03 Feb 2013 20:08:38 -0200
+
+tunesviewer (1.5-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Rogério Brito <rbrito@ime.usp.br>  Tue, 27 Nov 2012 03:35:09 -0200
+
 tunesviewer (1.4.99.3-1~1.gbpd5c606) UNRELEASED; urgency=medium
 
   ** SNAPSHOT build @d5c6065df5de1fecdc942f0203c1c10425d12367 **
