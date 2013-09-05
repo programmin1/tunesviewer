@@ -21,7 +21,7 @@ import ConfigParser
 import logging
 import os
 
-from gi.repository import Gtk as gtk
+import gtk
 
 import firstsetup
 from constants import DEFAULT_OPENER, HOME_URL, DOWNLOADS_DIR, PREFS_DIR, PREFS_FILE
@@ -65,11 +65,11 @@ class ConfigBox:
 	def __init__(self, mw):
 		self.window = gtk.Dialog("TunesViewer Preferences",
 					 None,
-					 gtk.DialogFlags.DESTROY_WITH_PARENT,
+					 gtk.DIALOG_DESTROY_WITH_PARENT,
 					 (gtk.STOCK_OK, 1, gtk.STOCK_CANCEL, 0))
 		self.mainwin = mw
 		self.window.set_icon(self.window.render_icon(gtk.STOCK_PREFERENCES,
-							     gtk.IconSize.BUTTON))
+							     gtk.ICON_SIZE_BUTTON))
 		self.window.connect("response", self.response) # Ok/Cancel
 		self.window.connect("delete_event", self.delete_event)
 
@@ -82,18 +82,17 @@ class ConfigBox:
 
 		# Start of Download tab
 		dhbox = gtk.HBox()
-		labels = gtk.ListStore(str)
-		labels.append(["Only Follow links"])
-		labels.append(["View Streaming or Follow-link"])
-		labels.append(["Download or Follow-link"])
-		self.combo = gtk.ComboBox(model=labels)
+		self.combo = gtk.combo_box_new_text()
+		self.combo.append_text("Only Follow links")
+		self.combo.append_text("View Streaming or Follow-link")
+		self.combo.append_text("Download or Follow-link")
 		self.combo.set_active(1)
 		dhbox.pack_start(gtk.Label("Default action: "), False, False, 0)
 		dhbox.pack_start(self.combo, True, True, 0)
 		dtab.pack_start(dhbox, True, False, 0)
 
 		self.downloadsel = gtk.FileChooserButton("Select a folder to download to")
-		self.downloadsel.set_action(gtk.FileChooserAction.SELECT_FOLDER)
+		self.downloadsel.set_action(gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER)
 		hbox = gtk.HBox()
 		hbox.pack_start(gtk.Label("Download Folder: "), False, False, 0)
 		hbox.pack_start(self.downloadsel, True, True, 0)
@@ -114,21 +113,18 @@ class ConfigBox:
 		lab2.set_alignment(0, 1)
 		dtab.pack_start(lab2, True, False, 0)
 		sw = gtk.ScrolledWindow()
-		sw.set_policy(gtk.PolicyType.AUTOMATIC, gtk.PolicyType.AUTOMATIC)
+		sw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
 		self.viewer = gtk.TextView()
 		sw.add(self.viewer)
 		dtab.pack_start(sw, True, True, 0)
 
-		dtab.pack_start(gtk.Label("Podcast manager command: (%u is the url, %i is itpc:// url)"),True,True,0)
-		progs = gtk.ListStore(str)
-		progs.append(["amarok -l %i"])
-		progs.append(["gpodder -s %u"])
-		progs.append(["miro %u"])
-		progs.append(["rhythmbox %i"])
-		progs.append(["banshee %i"])
-		self.podcastprogbox = gtk.ComboBox(model=progs)
-		self.podcastprogbox.set_entry_text_column(1)
-		
+		dtab.pack_start(gtk.Label("Podcast manager command: (%u is the url, %i is itpc:// url)"))
+		self.podcastprogbox = gtk.combo_box_entry_new_text()
+		self.podcastprogbox.append_text("amarok -l %i")
+		self.podcastprogbox.append_text("gpodder -s %u")
+		self.podcastprogbox.append_text("miro %u")
+		self.podcastprogbox.append_text("rhythmbox %i")
+		self.podcastprogbox.append_text("banshee %i")
 		dtab.pack_start(self.podcastprogbox, True, False, 0)
 		# End download tab
 
@@ -173,7 +169,7 @@ class ConfigBox:
 
 		# default program frame:
 		defFrame = gtk.Frame(label="Default handler for itms, itmss, itpc protocols:")
-		vtab.pack_start(defFrame,True,True,0)
+		vtab.pack_start(defFrame)
 		defv = gtk.VBox()
 		defFrame.add(defv)
 		setbutton = gtk.Button("Set TunesViewer as default opener")
@@ -184,9 +180,9 @@ class ConfigBox:
 		setother = gtk.Button("Set Default")
 		setother.connect("clicked", self.setOtherDefault)
 		otherHbox = gtk.HBox()
-		otherHbox.pack_start(gtk.Label("Other program:"),True,True,0)
-		otherHbox.pack_start(self.setOtherProg,True,True,0)
-		otherHbox.pack_start(setother,True,True,0)
+		otherHbox.pack_start(gtk.Label("Other program:"))
+		otherHbox.pack_start(self.setOtherProg)
+		otherHbox.pack_start(setother)
 		defv.pack_start(otherHbox, True, False, 0)
 		# End display tab
 
@@ -230,7 +226,7 @@ class ConfigBox:
 		logging.debug("Saving Prefs")
 		#First set the variables to the new values:
 		text = self.viewer.get_buffer().get_slice(self.viewer.get_buffer().get_start_iter(),
-							  self.viewer.get_buffer().get_end_iter(),True)
+							  self.viewer.get_buffer().get_end_iter())
 		self.openers = self.getopeners(text)
 		self.downloadfile = self.filenamesel.get_text()
 		self.downloadsafe = self.downloadsafeCheck.get_active()
@@ -246,8 +242,7 @@ class ConfigBox:
 			self.downloadfolder = DOWNLOADS_DIR
 		self.defaultcommand = self.combo.get_active()
 		self.notifyseconds = int(self.notifyEntry.get_text())
-		#TODO: fix:
-		#self.podcastprog = self.podcastprogbox.get_child().get_text()
+		self.podcastprog = self.podcastprogbox.child.get_text()
 		try:
 			self.iconsizeN = int(self.iconsize.get_text())
 			self.imagesizeN = int(self.imagesize.get_text())
@@ -342,7 +337,7 @@ class ConfigBox:
 		self.filenamesel.set_text(self.downloadfile)
 		self.combo.set_active(int(self.defaultcommand))
 		self.notifyEntry.set_text(str(self.notifyseconds))
-		self.podcastprogbox.set_title(self.podcastprog)
+		self.podcastprogbox.child.set_text(self.podcastprog)
 		self.imagesize.set_text(str(self.imagesizeN))
 		self.iconsize.set_text(str(self.iconsizeN))
 		self.homeEntry.set_text(self.home)
@@ -402,9 +397,9 @@ class ConfigBox:
 		err += setup.setdefaultprotocol("itpc", self.setOtherProg.get_text())
 		if err:
 			msg = gtk.MessageDialog(self.window,
-				gtk.DialogFlags.MODAL,
-				gtk.MessageType.ERROR,
-				gtk.ButtonsType.CLOSE,
-				"Unable to set defaults.")
+						gtk.DIALOG_MODAL,
+						gtk.MESSAGE_ERROR,
+						gtk.BUTTONS_CLOSE,
+						"Unable to set defaults.")
 			msg.run()
 			msg.destroy()

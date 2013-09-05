@@ -35,12 +35,10 @@ from StringIO import StringIO
 from threading import Thread
 
 # Import third-party modules (GTK and siblings for GUI)
-from gi.repository import GLib as glib
-from gi.repository import GObject as gobject
-from gi.repository import Gdk as gdk
-from gi.repository import Gtk as gtk
-from gi.repository import Pango as pango
-from gi.repository import GdkPixbuf
+import glib
+import gobject
+import gtk
+import pango
 
 gobject.threads_init()
 
@@ -76,15 +74,12 @@ class TunesViewer:
 
 	# Initializes the main window
 	def __init__(self, dname=None):
-		self.icon_video = None
-		self.icon_pdf = None  # tada
-		self.icon_book = None
 		self.downloadbox = DownloadBox(self) # Only one downloadbox is constructed
 		self.findbox = FindBox(self)
 		self.findInPage = FindInPageBox()
 		self.findInPage.connect('find', self.find_in_page_cb)
 		# Create a new window, initialize all widgets:
-		self.window = gtk.Window(gtk.WindowType.TOPLEVEL)
+		self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
 		self.window.set_title("TunesViewer")
 		self.window.set_size_request(350, 350) #minimum
 		self.window.resize(750, 750) #default
@@ -104,7 +99,7 @@ class TunesViewer:
 			logging.warn("Couldn't load window icon.")
 
 		# will hold icon, title, artist, time, type, comment, releasedate, datemodified, gotourl, previewurl, price, itemid.
-		self.liststore = gtk.ListStore(GdkPixbuf.Pixbuf, str, str,
+		self.liststore = gtk.ListStore(gtk.gdk.Pixbuf, str, str,
 					       str, str, str, str, str, str,
 					       str, str, str)
 
@@ -112,28 +107,28 @@ class TunesViewer:
 		self.treeview = gtk.TreeView(model=self.liststore)
 		self.treeview.set_enable_search(True)
 		self.scrolledwindow = gtk.ScrolledWindow()
-		self.scrolledwindow.set_policy(gtk.PolicyType.AUTOMATIC,
-					       gtk.PolicyType.AUTOMATIC)
+		self.scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC,
+					       gtk.POLICY_AUTOMATIC)
 		self.scrolledwindow.add(self.treeview)
 
 		cell = gtk.CellRendererText()
 		# Set the cell-renderer to ellipsize ... at end.
-		cell.set_property("ellipsize", pango.EllipsizeMode.END)
+		cell.set_property("ellipsize", pango.ELLIPSIZE_END)
 		# Set single-paragraph-mode, no huge multiline display rows.
 		cell.set_property("single-paragraph-mode", True)
 
 		col = gtk.TreeViewColumn(" ")
 		# col.set_sizing(gtk.TREE_VIEW_COLUMN_AUTOSIZE)
 		pb = gtk.CellRendererPixbuf()
-		col.pack_start(pb,True)
+		col.pack_start(pb)
 		col.add_attribute(pb, 'pixbuf', 0)
 		self.treeview.append_column(col)
 
 		# Now each column is created and added:
 		col = gtk.TreeViewColumn("Name")
-		col.pack_start(cell,True)
+		col.pack_start(cell)
 		col.add_attribute(cell, 'markup', 1) # because markup, not text, is required in tooltip.
-		col.props.sizing=(gtk.TreeViewColumnSizing.FIXED)
+		col.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
 		col.set_fixed_width(200)
 		col.set_expand(True)
 		col.set_resizable(True)
@@ -146,9 +141,9 @@ class TunesViewer:
 		self.treeview.set_tooltip_column(1) # needs markup, not text
 
 		col = gtk.TreeViewColumn("Author")
-		col.pack_start(cell,True)
+		col.pack_start(cell)
 		col.add_attribute(cell, 'text', 2)
-		col.props.sizing=(gtk.TreeViewColumnSizing.FIXED)
+		col.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
 		#col.set_expand(True)
 		col.set_fixed_width(150)
 		col.set_resizable(True)
@@ -159,10 +154,10 @@ class TunesViewer:
 
 		time_cell = gtk.CellRendererText()
 		col = gtk.TreeViewColumn("Time")
-		col.pack_start(time_cell,True)
+		col.pack_start(time_cell)
 		time_cell.set_property('xalign', 1.0)
 		col.add_attribute(time_cell, 'text', 3)
-		col.props.sizing=(gtk.TreeViewColumnSizing.AUTOSIZE)
+		col.set_sizing(gtk.TREE_VIEW_COLUMN_AUTOSIZE)
 		col.set_resizable(True)
 		col.set_reorderable(True)
 		self.treeview.set_search_column(3)
@@ -170,9 +165,9 @@ class TunesViewer:
 		self.treeview.append_column(col)
 
 		col = gtk.TreeViewColumn("Type")
-		col.pack_start(cell,True)
+		col.pack_start(cell)
 		col.add_attribute(cell, 'text', 4)
-		col.props.sizing=(gtk.TreeViewColumnSizing.AUTOSIZE)
+		col.set_sizing(gtk.TREE_VIEW_COLUMN_AUTOSIZE)
 		col.set_resizable(True)
 		col.set_reorderable(True)
 		self.treeview.set_search_column(4)
@@ -180,9 +175,9 @@ class TunesViewer:
 		self.treeview.append_column(col)
 
 		col = gtk.TreeViewColumn("Comment")
-		col.pack_start(cell,True)
+		col.pack_start(cell)
 		col.add_attribute(cell, 'text', 5)
-		col.props.sizing=(gtk.TreeViewColumnSizing.FIXED)
+		col.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
 		col.set_expand(True)
 		col.set_min_width(100)
 		col.set_resizable(True)
@@ -193,9 +188,9 @@ class TunesViewer:
 		self.treeview.set_search_column(0)
 
 		col = gtk.TreeViewColumn("Release Date")
-		col.pack_start(cell,True)
+		col.pack_start(cell)
 		col.add_attribute(cell, 'text', 6)
-		col.props.sizing=(gtk.TreeViewColumnSizing.AUTOSIZE)
+		col.set_sizing(gtk.TREE_VIEW_COLUMN_AUTOSIZE)
 		col.set_resizable(True)
 		col.set_reorderable(True)
 		self.treeview.set_search_column(6)
@@ -204,8 +199,9 @@ class TunesViewer:
 		self.treeview.set_search_column(0)
 
 		col = gtk.TreeViewColumn("Modified Date")
-		col.pack_start(cell,True)
-		col.props.sizing=(gtk.TreeViewColumnSizing.AUTOSIZE)
+		col.pack_start(cell)
+		col.add_attribute(cell, 'text', 7)
+		col.set_sizing(gtk.TREE_VIEW_COLUMN_AUTOSIZE)
 		col.set_resizable(True)
 		col.set_reorderable(True)
 		self.treeview.set_search_column(7)
@@ -215,18 +211,14 @@ class TunesViewer:
 
 		self.treeview.connect("row-activated", self.rowSelected)
 		self.treeview.get_selection().set_select_function(self.treesel,
-								  None)
+								  data=None)
 
 		# Make the locationbar-searchbar:
 		locationbox = gtk.HBox()
-		labels = gtk.ListStore(str)
-		labels.append(["Url:"])
-		labels.append(["iTunesU Search:"])
-		labels.append(['Podcast Search:'])
-		self.modecombo = gtk.ComboBox(model=labels)
-		renderer_text = gtk.CellRendererText()
-		self.modecombo.pack_start(renderer_text, True)
-		self.modecombo.add_attribute(renderer_text, "text",0)
+		self.modecombo = gtk.combo_box_new_text()
+		self.modecombo.append_text("Url:")
+		self.modecombo.append_text("iTunesU Search:")
+		self.modecombo.append_text("Podcast Search:")
 		self.modecombo.set_active(1)
 		self.modecombo.connect("changed", self.combomodechanged)
 		locationbox.pack_start(self.modecombo, False, False, 0)
@@ -243,9 +235,9 @@ class TunesViewer:
 
 		gobutton.connect("clicked", self.gobutton)
 		locationbox.pack_start(gobutton, False, False, 0)
-		#prefheight = self.locationentry.size_request()[1]
+		prefheight = self.locationentry.size_request()[1]
 		#Default button is very tall, try to make buttons the same height as the text box:
-		#gobutton.set_size_request(-1, prefheight)
+		gobutton.set_size_request(-1, prefheight)
 
 		# Now make menus: http://zetcode.com/tutorials/pygtktutorial/menus/
 		agr = gtk.AccelGroup()
@@ -257,9 +249,8 @@ class TunesViewer:
 
 		throbber_path = '/usr/share/tunesviewer/Throbber.gif'
 		try:
-			pass
-			#self.throbber.set_from_animation(GdkPixbuf.PixbufAnimation(throbber_path))
-			#menubox.pack_start(self.throbber, expand=False)
+			self.throbber.set_from_animation(gtk.gdk.PixbufAnimation(throbber_path))
+			menubox.pack_start(self.throbber, expand=False)
 		except glib.GError as e:
 			logging.error('Could not set the throbber: %s' % str(e))
 
@@ -270,32 +261,32 @@ class TunesViewer:
 		filem.set_submenu(filemenu)
 
 		## Advanced search
-		aSearch = gtk.ImageMenuItem.new_from_stock(gtk.STOCK_FIND,None)
+		aSearch = gtk.ImageMenuItem(gtk.STOCK_FIND)
 		aSearch.set_label("Advanced _Search...")
 		aSearch.connect("activate", self.advancedSearch)
 		key, mod = gtk.accelerator_parse("<Ctrl>K")
 		aSearch.add_accelerator("activate", agr, key, mod,
-					gtk.AccelFlags.VISIBLE)
+					gtk.ACCEL_VISIBLE)
 		filemenu.append(aSearch)
 
 		## Search on current page
-		pSearch = gtk.ImageMenuItem.new_from_stock(gtk.STOCK_FIND,None)
+		pSearch = gtk.ImageMenuItem(gtk.STOCK_FIND)
 		pSearch.set_label("Find on Current Page...")
 		pSearch.connect("activate", self.searchCurrent)
 		key, mod = gtk.accelerator_parse("<Ctrl>F")
 		pSearch.add_accelerator("activate", agr, key, mod,
-					gtk.AccelFlags.VISIBLE)
+					gtk.ACCEL_VISIBLE)
 		filemenu.append(pSearch)
 
 		filemenu.append(gtk.SeparatorMenuItem())
 
 		## Exit application
-		exit = gtk.ImageMenuItem.new_from_stock(gtk.STOCK_QUIT,None)
+		exit = gtk.ImageMenuItem(gtk.STOCK_QUIT)
 		exit.set_label("E_xit")
 		exit.connect("activate", self.exitclicked)
 		key, mod = gtk.accelerator_parse("<Ctrl>Q")
 		exit.add_accelerator("activate", agr, key, mod,
-				     gtk.AccelFlags.VISIBLE)
+				     gtk.ACCEL_VISIBLE)
 		filemenu.append(exit)
 
 		### Edit menu
@@ -304,27 +295,27 @@ class TunesViewer:
 		editm.set_submenu(editmenu)
 
 		## Copy podcast URL
-		self.copym = gtk.ImageMenuItem.new_from_stock(gtk.STOCK_COPY,None)
+		self.copym = gtk.ImageMenuItem(gtk.STOCK_COPY)
 		self.copym.set_label("_Copy Normal Podcast Url")
 		self.copym.connect("activate", self.copyrss)
 		key, mod = gtk.accelerator_parse("<Ctrl><Shift>C")
 		self.copym.add_accelerator("activate", agr, key, mod,
-					   gtk.AccelFlags.VISIBLE)
+					   gtk.ACCEL_VISIBLE)
 		editmenu.append(self.copym)
 
 		## Paste URL
-		pastem = gtk.ImageMenuItem.new_from_stock(gtk.STOCK_PASTE,None)
+		pastem = gtk.ImageMenuItem(gtk.STOCK_PASTE)
 		pastem.set_label("Paste and _Goto Url")
 		pastem.connect("activate", self.pastego)
 		key, mod = gtk.accelerator_parse("<Ctrl><Shift>V")
 		pastem.add_accelerator("activate", agr, key, mod,
-				       gtk.AccelFlags.VISIBLE)
+				       gtk.ACCEL_VISIBLE)
 		editmenu.append(pastem)
 
 		editmenu.append(gtk.SeparatorMenuItem())
 
 		## Preferences
-		prefs = gtk.ImageMenuItem.new_from_stock(gtk.STOCK_PREFERENCES,None)
+		prefs = gtk.ImageMenuItem(gtk.STOCK_PREFERENCES)
 		prefs.connect("activate", self.openprefs)
 		editmenu.append(prefs)
 
@@ -334,7 +325,7 @@ class TunesViewer:
 		viewm.set_submenu(viewmenu)
 
 		## Request content in HTML mode
-		self.htmlmode = gtk.CheckMenuItem.new_with_mnemonic("Request _HTML Mode")
+		self.htmlmode = gtk.CheckMenuItem("Request _HTML Mode")
 		self.htmlmode.set_active(True)
 		viewmenu.append(self.htmlmode)
 
@@ -344,11 +335,11 @@ class TunesViewer:
 		viewmenu.append(gtk.SeparatorMenuItem())
 
 		## Show downloads
-		viewdownloads = gtk.ImageMenuItem.new_from_stock(gtk.STOCK_GO_DOWN,None)
+		viewdownloads = gtk.ImageMenuItem(gtk.STOCK_GO_DOWN)
 		viewdownloads.set_label("Show _Downloads")
 		key, mod = gtk.accelerator_parse("<Ctrl>j")
 		viewdownloads.add_accelerator("activate", agr, key, mod,
-					      gtk.AccelFlags.VISIBLE)
+					      gtk.ACCEL_VISIBLE)
 		viewdownloads.connect("activate", self.viewDownloads)
 		viewmenu.append(viewdownloads)
 
@@ -360,57 +351,57 @@ class TunesViewer:
 		viewmenu.append(gtk.SeparatorMenuItem())
 
 		## Zoom in
-		ziItem = gtk.ImageMenuItem.new_from_stock(gtk.STOCK_ZOOM_IN,None)
+		ziItem = gtk.ImageMenuItem(gtk.STOCK_ZOOM_IN)
 		key, mod = gtk.accelerator_parse("<Ctrl>plus")
 		ziItem.add_accelerator("activate", agr, key, mod,
-				       gtk.AccelFlags.VISIBLE)
+				       gtk.ACCEL_VISIBLE)
 		ziItem.connect("activate", self.webkitZI)
 		viewmenu.append(ziItem)
 
 		## Zoom out
-		zoItem = gtk.ImageMenuItem.new_from_stock(gtk.STOCK_ZOOM_OUT,None)
+		zoItem = gtk.ImageMenuItem(gtk.STOCK_ZOOM_OUT)
 		key, mod = gtk.accelerator_parse("<Ctrl>minus")
 		zoItem.add_accelerator("activate", agr, key, mod,
-				       gtk.AccelFlags.VISIBLE)
+				       gtk.ACCEL_VISIBLE)
 		zoItem.connect("activate", self.webkitZO)
 		viewmenu.append(zoItem)
 
 		## Reset zoom
-		znItem = gtk.ImageMenuItem.new_from_stock(gtk.STOCK_ZOOM_100,None)
+		znItem = gtk.ImageMenuItem(gtk.STOCK_ZOOM_100)
 		key, mod = gtk.accelerator_parse("<Ctrl>0")
 		znItem.add_accelerator("activate", agr, key, mod,
-				       gtk.AccelFlags.VISIBLE)
+				       gtk.ACCEL_VISIBLE)
 		znItem.connect("activate", self.webkitZN)
 		viewmenu.append(znItem)
 
 		viewmenu.append(gtk.SeparatorMenuItem())
 
 		## View page source
-		viewsource = gtk.MenuItem.new_with_mnemonic("Page _Source")
+		viewsource = gtk.MenuItem("Page _Source")
 		key, mod = gtk.accelerator_parse("<Ctrl>U")
 		viewsource.add_accelerator("activate", agr, key, mod,
-					   gtk.AccelFlags.VISIBLE)
+					   gtk.ACCEL_VISIBLE)
 		viewsource.connect("activate", self.viewsource)
 		viewmenu.append(viewsource)
 
 		## View cookies
-		viewcookie = gtk.MenuItem.new_with_mnemonic("_Cookies")
+		viewcookie = gtk.MenuItem("_Cookies")
 		viewcookie.connect("activate", self.viewCookie)
 		viewmenu.append(viewcookie)
 
 		## View information of selected item
-		viewprop = gtk.ImageMenuItem.new_from_stock(gtk.STOCK_INFO,None)
+		viewprop = gtk.ImageMenuItem(gtk.STOCK_INFO)
 		viewprop.set_label("Selection _Info")
 		key, mod = gtk.accelerator_parse("<Ctrl>I")
 		viewprop.add_accelerator("activate", agr, key, mod,
-					 gtk.AccelFlags.VISIBLE)
+					 gtk.ACCEL_VISIBLE)
 		viewmenu.append(viewprop)
 		viewprop.connect("activate", self.viewprop)
 
 		self.locShortcut = gtk.MenuItem("Current _URL")
 		key, mod = gtk.accelerator_parse("<Ctrl>L")
 		self.locShortcut.add_accelerator("activate", agr, key, mod,
-						 gtk.AccelFlags.VISIBLE)
+						 gtk.ACCEL_VISIBLE)
 		viewmenu.append(self.locShortcut)
 		self.locShortcut.hide()
 		self.locShortcut.connect("activate", self.locationBar)
@@ -422,52 +413,52 @@ class TunesViewer:
 
 		## iTunes U subdirectory
 		self.itunesuDir = gtk.Menu()
-		itunesu = gtk.MenuItem.new_with_mnemonic("iTunes_U")
+		itunesu = gtk.MenuItem("iTunes_U")
 		itunesu.set_submenu(self.itunesuDir)
 		#self.itunesuDir.append(gtk.MenuItem("directory here"))
 		gomenu.append(itunesu)
 
 		## Podcast subdirectory
 		self.podcastDir = gtk.Menu()
-		podcasts = gtk.MenuItem.new_with_mnemonic("_Podcasts")
+		podcasts = gtk.MenuItem("_Podcasts")
 		podcasts.set_submenu(self.podcastDir)
 		#self.podcastDir.append(gtk.MenuItem("directory here"))
 		gomenu.append(podcasts)
 
 		## Go back
-		back = gtk.ImageMenuItem.new_from_stock(gtk.STOCK_GO_BACK,None)
+		back = gtk.ImageMenuItem(gtk.STOCK_GO_BACK)
 		key, mod = gtk.accelerator_parse("<Alt>Left")
 		back.add_accelerator("activate", agr, key, mod,
-				     gtk.AccelFlags.VISIBLE)
+				     gtk.ACCEL_VISIBLE)
 		back.connect("activate", self.goBack)
 		gomenu.append(back)
 
 		## Go forward
-		forward = gtk.ImageMenuItem.new_from_stock(gtk.STOCK_GO_FORWARD,None)
+		forward = gtk.ImageMenuItem(gtk.STOCK_GO_FORWARD)
 		key, mod = gtk.accelerator_parse("<Alt>Right")
 		forward.add_accelerator("activate", agr, key, mod,
-					gtk.AccelFlags.VISIBLE)
+					gtk.ACCEL_VISIBLE)
 		forward.connect("activate", self.goForward)
 		gomenu.append(forward)
 
 		## Refresh page
-		refresh = gtk.ImageMenuItem.new_from_stock(gtk.STOCK_REFRESH,None)
+		refresh = gtk.ImageMenuItem(gtk.STOCK_REFRESH)
 		key, mod = gtk.accelerator_parse("F5")
 		refresh.add_accelerator("activate", agr, key, mod,
-					gtk.AccelFlags.VISIBLE)
+					gtk.ACCEL_VISIBLE)
 		refresh.connect("activate", self.refresh)
 		gomenu.append(refresh)
 
 		## Stop loading
-		stop = gtk.ImageMenuItem.new_from_stock(gtk.STOCK_STOP,None)
+		stop = gtk.ImageMenuItem(gtk.STOCK_STOP)
 		key, mod = gtk.accelerator_parse("Escape")
 		stop.add_accelerator("activate", agr, key, mod,
-				     gtk.AccelFlags.VISIBLE)
+				     gtk.ACCEL_VISIBLE)
 		stop.connect("activate", self.stop)
 		gomenu.append(stop)
 
 		## Go to the initial page
-		homeb = gtk.ImageMenuItem.new_from_stock(gtk.STOCK_HOME,None)
+		homeb = gtk.ImageMenuItem(gtk.STOCK_HOME)
 		homeb.connect("activate", self.goHome)
 		gomenu.append(homeb)
 
@@ -477,61 +468,61 @@ class TunesViewer:
 		itemm.set_submenu(itemmenu)
 
 		## Go to link
-		follow = gtk.ImageMenuItem.new_from_stock(gtk.STOCK_JUMP_TO,None)
+		follow = gtk.ImageMenuItem(gtk.STOCK_JUMP_TO)
 		follow.connect("activate", self.followlink)
 		follow.set_label("_Goto Link")
 		key, mod = gtk.accelerator_parse("<Ctrl>G")
 		follow.add_accelerator("activate", agr, key, mod,
-				       gtk.AccelFlags.VISIBLE)
+				       gtk.ACCEL_VISIBLE)
 		itemmenu.append(follow)
 
 		## Play/View file
-		playview = gtk.ImageMenuItem.new_from_stock(gtk.STOCK_MEDIA_PLAY,None)
+		playview = gtk.ImageMenuItem(gtk.STOCK_MEDIA_PLAY)
 		playview.set_label("_Play/View File")
 		playview.connect("activate", self.playview)
 		key, mod = gtk.accelerator_parse("<Ctrl>P")
 		playview.add_accelerator("activate", agr, key, mod,
-					 gtk.AccelFlags.VISIBLE)
+					 gtk.ACCEL_VISIBLE)
 		itemmenu.append(playview)
 
 		## Download file
-		download = gtk.ImageMenuItem.new_from_stock(gtk.STOCK_SAVE,None)
+		download = gtk.ImageMenuItem(gtk.STOCK_SAVE)
 		download.set_label("_Download File")
 		download.connect("activate", self.download)
 		key, mod = gtk.accelerator_parse("<Ctrl>D")
 		download.add_accelerator("activate", agr, key, mod,
-					 gtk.AccelFlags.VISIBLE)
+					 gtk.ACCEL_VISIBLE)
 		itemmenu.append(download)
 
 		## Add Page to podcast manager
-		self.addpodmenu = gtk.ImageMenuItem.new_from_stock(gtk.STOCK_ADD,None)
+		self.addpodmenu = gtk.ImageMenuItem(gtk.STOCK_ADD)
 		self.addpodmenu.set_label("_Add Page to Podcast Manager")
 		self.addpodmenu.connect("activate", self.addPod)
 		itemmenu.append(self.addpodmenu)
 
 		### Contextual (right-click) menu
 		self.rcmenu = gtk.Menu()
-		self.rcgoto = gtk.ImageMenuItem.new_from_stock(gtk.STOCK_JUMP_TO,None)
+		self.rcgoto = gtk.ImageMenuItem(gtk.STOCK_JUMP_TO)
 		self.rcgoto.connect("activate", self.followlink)
 		self.rcgoto.set_label("_Goto")
 		self.rcgoto.show()
 
-		self.rccopy = gtk.ImageMenuItem.new_from_stock(gtk.STOCK_COPY,None)
+		self.rccopy = gtk.ImageMenuItem(gtk.STOCK_COPY)
 		self.rccopy.connect("activate", self.copyRowLink)
 		self.rccopy.set_label("_Copy Link")
 		self.rccopy.show()
 
-		self.rcplay = gtk.ImageMenuItem.new_from_stock(gtk.STOCK_MEDIA_PLAY,None)
+		self.rcplay = gtk.ImageMenuItem(gtk.STOCK_MEDIA_PLAY)
 		self.rcplay.connect("activate", self.playview)
 		self.rcplay.set_label("_Play/View")
 		self.rcplay.show()
 
-		self.rcdownload = gtk.ImageMenuItem.new_from_stock(gtk.STOCK_SAVE,None)
+		self.rcdownload = gtk.ImageMenuItem(gtk.STOCK_SAVE)
 		self.rcdownload.connect("activate", self.download)
 		self.rcdownload.set_label("_Download")
 		self.rcdownload.show()
 
-		rcinfo = gtk.ImageMenuItem.new_from_stock(gtk.STOCK_INFO,None)
+		rcinfo = gtk.ImageMenuItem(gtk.STOCK_INFO)
 		rcinfo.connect("activate", self.viewprop)
 		rcinfo.set_label("Item _Info")
 		rcinfo.show()
@@ -549,12 +540,12 @@ class TunesViewer:
 		helpm.set_submenu(helpmenu)
 
 		## Help
-		helpitem = gtk.ImageMenuItem.new_from_stock(gtk.STOCK_HELP,None)
+		helpitem = gtk.ImageMenuItem(gtk.STOCK_HELP)
 		helpitem.connect("activate", self.showHelp)
 		helpmenu.append(helpitem)
 
 		## Check for updates
-		helpupdate = gtk.MenuItem.new_with_mnemonic("Check for _Update...")
+		helpupdate = gtk.MenuItem("Check for _Update...")
 		helpupdate.connect("activate", self.progUpdate)
 		helpmenu.append(helpupdate)
 
@@ -599,7 +590,7 @@ class TunesViewer:
 		vpaned = gtk.VPaned()
 		vpaned.set_position(500)
 		sw = gtk.ScrolledWindow()
-		sw.set_policy(gtk.PolicyType.AUTOMATIC,gtk.PolicyType.AUTOMATIC)
+		sw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
 		self.descView = WebKitView(self)
 
 		sw.add(self.descView)
@@ -679,7 +670,7 @@ class TunesViewer:
 		self.tbAuth = gtk.ToolButton(gtk.STOCK_DIALOG_AUTHENTICATION)
 		self.toolbar.insert(self.tbAuth, -1)
 
-		#self.toolbar.set_icon_size(gtk.ICON_SIZE_SMALL_TOOLBAR)
+		self.toolbar.set_icon_size(gtk.ICON_SIZE_SMALL_TOOLBAR)
 
 		# All those objects go in the main vbox:
 		self.mainvbox = gtk.VBox()
@@ -689,7 +680,7 @@ class TunesViewer:
 		#self.mainvbox.pack_start(self.scrolledwindow, True, True, 0)
 		self.mainvbox.pack_start(vpaned, True, True, 0)
 		self.statusbar = gtk.Label()
-		self.statusbar.set_justify(gtk.Justification.LEFT)
+		self.statusbar.set_justify(gtk.JUSTIFY_LEFT)
 		self.mainvbox.pack_start(self.statusbar, False, True, 0)
 		#self.window.set_property('allow-shrink', True)
 
@@ -772,15 +763,15 @@ class TunesViewer:
 		"""Checks for update to the program."""
 		openDefault("http://tunesviewer.sourceforge.net/checkversion.php?version="+TV_VERSION)
 
-	def treesel(self, selection, model,treepath,thing,thing2):
+	def treesel(self, selection, model):
 		"""Called when selection changes, changes the enabled toolbar buttons."""
 		self.tbInfo.set_sensitive(True)
-		ind = treepath
-		gotoable = (model[ind][8] != "")
-		playable = (model[ind][9] != "")
-		downloadable = (model[ind][9] != "" and
-				(model[ind][10] == "" or
-				 model[ind][10] == "0"))
+		ind = selection[0]
+		gotoable = (self.liststore[ind][8] != "")
+		playable = (self.liststore[ind][9] != "")
+		downloadable = (self.liststore[ind][9] != "" and
+				(self.liststore[ind][10] == "" or
+				 self.liststore[ind][10] == "0"))
 		self.tbGoto.set_sensitive(gotoable) # only if there is goto url
 		self.tbPlay.set_sensitive(playable) # only if there is media url
 		self.tbDownload.set_sensitive(downloadable)
@@ -827,9 +818,9 @@ class TunesViewer:
 			widget.currentFound += 1
 			if widget.currentFound >= len(self.liststore):
 				msg = gtk.MessageDialog(widget,
-						gtk.DialogFlags.MODAL,
-						gtk.MessageType.INFO,
-						gtk.ButtonsType.OK,
+							gtk.DIALOG_MODAL,
+							gtk.MESSAGE_INFO,
+							gtk.BUTTONS_OK,
 							"End of page.")
 				msg.run()
 				msg.destroy()
@@ -881,7 +872,7 @@ class TunesViewer:
 				treeview.grab_focus()
 				treeview.set_cursor(path, col, 0)
 				# Right click menu
-				self.rcmenu.popup(None, None, None,None,
+				self.rcmenu.popup(None, None, None,
 						  event.button, moment)
 			return True
 
@@ -904,9 +895,9 @@ class TunesViewer:
 
 	def showAbout(self, obj):
 		msg = gtk.MessageDialog(self.window,
-					gtk.DialogFlags.MODAL,
-					gtk.MessageType.INFO,
-					gtk.ButtonsType.CLOSE,
+					gtk.DIALOG_MODAL,
+					gtk.MESSAGE_INFO,
+					gtk.BUTTONS_CLOSE,
 					"TunesViewer - Easy iTunesU access\n"
 					"Version %s\n\n"
 					"(C) 2009 - 2012 Luke Bryan\n"
@@ -959,9 +950,9 @@ class TunesViewer:
 			subprocess.Popen(cmds)
 		except OSError as e:
 			msg = gtk.MessageDialog(self.window,
-						gtk.DialogFlags.MODAL,
-						gtk.MessageType.WARNING,
-						gtk.ButtonsType.CLOSE,
+						gtk.DIALOG_MODAL,
+						gtk.MESSAGE_WARNING,
+						gtk.BUTTONS_CLOSE,
 						"Error running: %s\n\n"
 						"Is the program installed and working?\n%s" % (" ".join(cmds), e))
 			msg.run()
@@ -1109,18 +1100,18 @@ class TunesViewer:
 			start(self.config.openers[kind], url)
 		elif url == "":
 			msg = gtk.MessageDialog(self.window,
-						gtk.DialogFlags.MODAL,
-						gtk.MessageType.WARNING,
-						gtk.ButtonsType.CLOSE,
+						gtk.DIALOG_MODAL,
+						gtk.MESSAGE_WARNING,
+						gtk.BUTTONS_CLOSE,
 						"This item is not a file.")
 			msg.run()
 			msg.destroy()
 			return
 		else:
 			msg = gtk.MessageDialog(self.window,
-						gtk.DialogFlags.MODAL,
-						gtk.MessageType.WARNING,
-						gtk.ButtonsType.CLOSE,
+						gtk.DIALOG_MODAL,
+						gtk.MESSAGE_WARNING,
+						gtk.BUTTONS_CLOSE,
 						"You don't have any program set to open " +
 						kind +
 						"\nfiles directly from the web. "
@@ -1169,9 +1160,9 @@ class TunesViewer:
 		url = properties[9]
 		if url == "":
 			msg = gtk.MessageDialog(self.window,
-						gtk.DialogFlags.MODAL,
-						gtk.MessageType.WARNING,
-						gtk.ButtonsType.CLOSE,
+						gtk.DIALOG_MODAL,
+						gtk.MESSAGE_WARNING,
+						gtk.BUTTONS_CLOSE,
 						"This item is not a file.")
 			msg.run()
 			msg.destroy()
@@ -1248,14 +1239,14 @@ class TunesViewer:
 		self.config.save_settings()
 		if self.downloadbox.downloadrunning:
 			msg = gtk.MessageDialog(self.window,
-						gtk.DialogFlags.MODAL,
-						gtk.MessageType.QUESTION,
-						gtk.ButtonsType.YES_NO,
+						gtk.DIALOG_MODAL,
+						gtk.MESSAGE_QUESTION,
+						gtk.BUTTONS_YES_NO,
 						"Are you sure you want to exit? "
 						"This will cancel all active downloads.")
 			answer = msg.run()
 			msg.destroy()
-			if answer == gtk.ResponseType.YES:
+			if answer == gtk.RESPONSE_YES:
 				# Clear crash recovery
 				try:
 					os.remove(pending_dl_file)
@@ -1287,9 +1278,9 @@ class TunesViewer:
 		if load:
 			if self.config.throbber:
 				self.throbber.show()
-			self.window.get_root_window().set_cursor(gdk.Cursor(gdk.CursorType.WATCH))
+			self.window.window.set_cursor(gtk.gdk.Cursor(gtk.gdk.WATCH))
 		else:
-			self.window.get_root_window().set_cursor(gdk.Cursor(gdk.CursorType.ARROW))
+			self.window.window.set_cursor(None)
 			self.throbber.hide()
 
 	def gotoURL(self, url, newurl):
@@ -1372,13 +1363,13 @@ class TunesViewer:
 		self.tz = str(-time.altzone)
 		self.opener.addheaders = [('User-agent', self.descView.ua),
 					  ('Accept-Encoding', 'gzip'),
-					  ('X-Apple-Tz', self.tz),
-					  ("X-Apple-Store-Front", "143441-1,12")]
+					  ('X-Apple-Tz', self.tz)]
 		htmMode = self.htmlmode.get_active() #the checkbox
 		if htmMode:
 			self.opener.addheaders = [('User-agent', self.descView.ua),
 						  ('Accept-Encoding', 'gzip'),
-						  ("X-Apple-Tz:", self.tz)]
+						  ("X-Apple-Tz:", self.tz),
+						  ("X-Apple-Store-Front", "143441-1,12")]
 		if self.mobilemode.get_active():
 			# As described on
 			# http://blogs.oreilly.com/iphone/2008/03/tmi-apples-appstore-protocol-g.html
@@ -1447,9 +1438,9 @@ class TunesViewer:
 			pass #just exited, don't crash.
 		if self.downloadError != "": #Warn if there is an error:
 			msg = gtk.MessageDialog(self.window,
-						gtk.DialogFlags.MODAL,
-						gtk.MessageType.ERROR,
-						gtk.ButtonsType.CLOSE,
+						gtk.DIALOG_MODAL,
+						gtk.MESSAGE_ERROR,
+						gtk.BUTTONS_CLOSE,
 						str(self.downloadError))
 			msg.run()
 			msg.destroy()
@@ -1500,7 +1491,7 @@ class TunesViewer:
 			self.treeview.set_model(None)
 
 			#Reset sorting:
-			self.liststore.set_sort_column_id(-2, gtk.SortType.DESCENDING)
+			self.liststore.set_sort_column_id(-2, gtk.SORT_DESCENDING)
 
 			#Load data:
 			self.descView.loadHTML(parser.HTML, url)
@@ -1519,7 +1510,7 @@ class TunesViewer:
 			mediacount = 0
 			linkscount = 0
 			for row in self.liststore:
-				if row[9]:
+				if len(row) > 10 and row[9]:
 					mediacount += 1
 				elif row[8]:
 					linkscount += 1
@@ -1572,7 +1563,7 @@ class TunesViewer:
 		self.icon_other = None
 		self.icon_link = None
 		try:
-			icon_theme = gtk.IconTheme.get_default() #Access theme's icons:
+			icon_theme = gtk.icon_theme_get_default() #Access theme's icons:
 			self.icon_audio = icon_theme.load_icon("sound", self.config.iconsizeN, 0)
 			self.icon_video = icon_theme.load_icon("video", self.config.iconsizeN, 0)
 			self.icon_pdf = icon_theme.load_icon("gnome-mime-application-pdf", self.config.iconsizeN, 0)
@@ -1629,7 +1620,7 @@ class VWin:
 		self.window.set_title(title)
 
 		self.sw = gtk.ScrolledWindow()
-		self.sw.set_policy(gtk.PolicyType.AUTOMATIC, gtk.PolicyType.AUTOMATIC)
+		self.sw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
 		self.viewer = gtk.TextView()
 		self.viewer.get_buffer().set_text(source)
 		self.viewer.set_wrap_mode(gtk.WRAP_WORD)

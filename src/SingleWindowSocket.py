@@ -24,8 +24,7 @@ import socket
 
 from threading import Thread
 
-
-from gi.repository import GObject as gobject
+import gobject
 
 from constants import DATA_SOCKET, DATA_DIR
 

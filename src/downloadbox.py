@@ -19,9 +19,9 @@ Download window class.
 """
 import logging
 
-from gi.repository import Gio as gio
-from gi.repository import GObject as gobject
-from gi.repository import Gtk as gtk
+import gobject
+import gio
+import gtk
 
 from downloader import Downloader
 from common import *
@@ -44,8 +44,8 @@ class DownloadBox:
 	def __init__(self, Wopener):
 		self.Wopener = Wopener # reference to main prog.
 		self.window = gtk.Window()
-		#self.window.set_icon(self.window.render_icon(gtk.STOCK_SAVE,
-		#					     gtk.ICON_SIZE_BUTTON))
+		self.window.set_icon(self.window.render_icon(gtk.STOCK_SAVE,
+							     gtk.ICON_SIZE_BUTTON))
 		self.window.set_title("Downloads")
 		self.window.set_size_request(500, 200)
 		self.window.connect("delete_event", self.onclose)
@@ -53,7 +53,7 @@ class DownloadBox:
 		self.vbox.show()
 		scrolledwindow = gtk.ScrolledWindow()
 		scrolledwindow.show()
-		scrolledwindow.set_policy(gtk.PolicyType.NEVER,  gtk.PolicyType.AUTOMATIC)
+		scrolledwindow.set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
 		scrolledwindow.add_with_viewport(self.vbox)
 		self.window.add(scrolledwindow)
 
@@ -107,17 +107,17 @@ class DownloadBox:
 		    self.lastCompleteDownloads != self.downloaded):
 			self.lastCompleteDownloads = self.downloaded
 			try:
-				from gi.repository import Notify
+				import pynotify
 				if self.total == 1:
 					s = ""
 				else:
 					s = "s"
-				Notify.init("TunesViewer")
-				n = Notify.Notification.new("Download%s Finished" % s,
+				pynotify.init("TunesViewer")
+				n = pynotify.Notification("Download%s Finished" % s,
 					"%s/%s download%s completed successfully." % (self.downloaded, self.total, s), gtk.STOCK_GO_DOWN)
 				n.set_timeout(1000 * self.Wopener.config.notifyseconds)
 				n.show()
-			except (ImportError, glib.GError) as e:
+			except (ImportError, gio.Error, glib.GError) as e:
 				logging.warn("Notification failed: " + str(e))
 
 	def newDownload(self, icon, url, localfile, opener):
@@ -134,9 +134,9 @@ class DownloadBox:
 				else:#if (i.success):
 					message = "File already downloaded."
 				msg = gtk.MessageDialog(self.window,
-							gtk.DialogFlags.MODAL,
-							gtk.MessageType.INFO,
-							gtk.ButtonsType.CLOSE,
+							gtk.DIALOG_MODAL,
+							gtk.MESSAGE_INFO,
+							gtk.BUTTONS_CLOSE,
 							message)
 				msg.run()
 				msg.destroy()
