@@ -1,3 +1,8 @@
+tunesviewer (1.5.2) stable; urgency=low
+
+  * Videos play in HTML5 in the webview - no "missing plugin" message.
+
+ -- Luke Bryan <luke32j@msn.com>  Sat, 18 Oct 2014 03:35:09 -0000
 
 tunesviewer (1.5.1) stable; urgency=medium
 
