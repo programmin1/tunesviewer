@@ -1,3 +1,9 @@
+tunesviewer (1.5.3) stable; urgency=medium
+  * Fix header error message in Ubuntu 15.04
+  * Fix country store setting - it can now be changed from the lower right icon on the page.
+  
+ -- Luke Bryan <luke32j@msn.com>  Sat, 18 Jul 2015 23:16:10 -0000
+
 tunesviewer (1.5.2) stable; urgency=low
 
   * Videos play in HTML5 in the webview - no "missing plugin" message.
