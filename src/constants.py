@@ -25,7 +25,7 @@ import glib
 
 # Path of the program (bad assumption)
 TV_PATH = "/usr/bin/tunesviewer"
-TV_VERSION = "1.5.3" #also needs changing in debian conf file somewhere
+TV_VERSION = "1.5.4" #also needs changing in debian/changelog
 
 # Directory under which we write configuration files
 USER_PREFS_DIR = glib.get_user_config_dir()

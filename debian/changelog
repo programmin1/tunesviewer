@@ -1,3 +1,7 @@
+tunesviewer (1.5.4) stable; urgency=medium
+  * Fix dependency for newer Ubuntu/Debian
+ -- Luke Bryan <luke32j@msn.com>  Sat, 7 May 2016 23:16:10 -0000
+
 tunesviewer (1.5.3) stable; urgency=medium
   * Fix header error message in Ubuntu 15.04
   * Fix country store setting - it can now be changed from the lower right icon on the page.

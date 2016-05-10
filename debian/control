@@ -17,7 +17,7 @@ Depends:
  python-gtk2 (>= 2.16),
  python-lxml (>= 2.0),
  python-notify,
- python-support (>= 0.90),
+ python-support (>= 0.90) | dh-python (>= 1.0),
  python-webkit (>= 1.1.4),
  ${misc:Depends}
 Recommends:
