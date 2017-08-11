@@ -14,11 +14,10 @@ Package: tunesviewer
 Architecture: all
 Depends:
  python (>= 2.6),
- python-gtk2 (>= 2.16),
+ python-gi (>= 3.12.0),
  python-lxml (>= 2.0),
- python-notify,
  python-support (>= 0.90) | dh-python (>= 1.0),
- python-webkit (>= 1.1.4),
+ gir1.2-webkit-3.0 (>= 2.4.10),
  ${misc:Depends}
 Recommends:
  rhythmbox-plugins (>= 0.12)
