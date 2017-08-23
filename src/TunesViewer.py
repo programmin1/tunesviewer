@@ -424,19 +424,19 @@ class TunesViewer:
 		gom = gtk.MenuItem("_Go")
 		gom.set_submenu(gomenu)
 
-		## iTunes U subdirectory
-		self.itunesuDir = gtk.Menu()
-		itunesu = gtk.MenuItem.new_with_mnemonic("iTunes_U")
-		itunesu.set_submenu(self.itunesuDir)
-		#self.itunesuDir.append(gtk.MenuItem("directory here"))
-		gomenu.append(itunesu)
+		# ## iTunes U subdirectory
+		# self.itunesuDir = gtk.Menu()
+		# itunesu = gtk.MenuItem.new_with_mnemonic("iTunes_U")
+		# itunesu.set_submenu(self.itunesuDir)
+		# #self.itunesuDir.append(gtk.MenuItem("directory here"))
+		# gomenu.append(itunesu)
 
-		## Podcast subdirectory
-		self.podcastDir = gtk.Menu()
-		podcasts = gtk.MenuItem.new_with_mnemonic("_Podcasts")
-		podcasts.set_submenu(self.podcastDir)
-		#self.podcastDir.append(gtk.MenuItem("directory here"))
-		gomenu.append(podcasts)
+		# ## Podcast subdirectory
+		# self.podcastDir = gtk.Menu()
+		# podcasts = gtk.MenuItem.new_with_mnemonic("_Podcasts")
+		# podcasts.set_submenu(self.podcastDir)
+		# #self.podcastDir.append(gtk.MenuItem("directory here"))
+		# gomenu.append(podcasts)
 
 		## Go back
 		back = gtk.ImageMenuItem.new_from_stock(gtk.STOCK_GO_BACK,None)
@@ -926,7 +926,7 @@ class TunesViewer:
 					gtk.ButtonsType.CLOSE,
 					"TunesViewer - Easy iTunesU access\n"
 					"Version %s\n\n"
-					"(C) 2009 - 2015 Luke Bryan\n"
+					"(C) 2009 - 2017 Luke Bryan\n"
 					"2011 - 2012 Rogério Theodoro de Brito\n"
 					"and other contributors.\n"
 					"Icon based on Michał Rzeszutek's openclipart hat.\n"
@@ -1662,7 +1662,7 @@ class VWin:
 		self.sw.set_policy(gtk.PolicyType.AUTOMATIC, gtk.PolicyType.AUTOMATIC)
 		self.viewer = gtk.TextView()
 		self.viewer.get_buffer().set_text(source)
-		self.viewer.set_wrap_mode(gtk.WRAP_WORD)
+		self.viewer.set_wrap_mode(gtk.WrapMode.WORD)
 		self.viewer.set_editable(False)
 		#TextView inside ScrolledWindow goes in the window:
 		self.sw.add(self.viewer)
