@@ -315,7 +315,7 @@ class TunesViewer:
 		self.copym.add_accelerator("activate", agr, key, mod,
 					   gtk.AccelFlags.VISIBLE)
 		editmenu.append(self.copym)
-
+		
 		## Paste URL
 		pastem = gtk.ImageMenuItem.new_from_stock(gtk.STOCK_PASTE,None)
 		pastem.set_label("Paste and _Goto Url")
@@ -959,8 +959,7 @@ class TunesViewer:
 
 	def pastego(self, obj):
 		"Gets the clipboard contents, and goes to link."
-		clip = gtk.clipboard_get()
-		text = clip.wait_for_text()
+		text = gtk.Clipboard.get(gdk.SELECTION_CLIPBOARD).wait_for_text()
 		if text != None:
 			self.gotoURL(text, True)
 
@@ -989,7 +988,7 @@ class TunesViewer:
 		Copies the standard rss podcast link for the current page.
 		"""
 		logging.debug("Copying: " + self.podcast)
-		gtk.Clipboard().set_text(self.podcast)
+		gtk.Clipboard.get(gdk.SELECTION_CLIPBOARD).set_text(self.podcast, -1)
 
 	def goBack(self, obj):
 		"""
@@ -1011,7 +1010,7 @@ class TunesViewer:
 			logging.debug(self.backStack)
 			logging.debug(self.forwardStack)
 		else:
-			gtk.gdk.beep()
+			gdk.beep()
 		#Update the back, forward buttons:
 		self.updateBackForward()
 
@@ -1029,7 +1028,7 @@ class TunesViewer:
 				#remove from forward:
 				self.forwardStack.pop()
 		else:
-			gtk.gdk.beep()
+			gdk.beep()
 		self.updateBackForward()
 
 	def updateBackForward(self):
@@ -1067,7 +1066,7 @@ class TunesViewer:
 		if self.selected() is None:
 			return
 		logging.debug(self.selected()[8])
-		gtk.Clipboard().set_text(self.selected()[8])
+		gtk.Clipboard.get(gdk.SELECTION_CLIPBOARD).set_text(self.selected()[8], -1)
 
 	def combomodechanged(self, obj):
 		"""
@@ -1351,7 +1350,7 @@ class TunesViewer:
 			return
 		elif url.startswith("copyurl://"):
 			tocopy = urllib.unquote(url[10:].replace("[http:]","http:").replace("[https:]","https:"))
-			gtk.Clipboard().set_text(tocopy)
+			gtk.Clipboard.get(gdk.SELECTION_CLIPBOARD).set_text(tocopy, -1)
 			logging.debug("copied "+tocopy)
 			return
 		elif url.startswith("store://"):
