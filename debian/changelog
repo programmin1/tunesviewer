@@ -1,3 +1,7 @@
+tunesviewer (1.99.3) beta; urgency=medium
+  * Fix bugs like clipboard not working.
+ -- Luke Bryan <luke32j@msn.com>  Sat, 2 Sept 2017 06:20:00 -0000
+
 tunesviewer (1.99.2) beta; urgency=medium
   * Fix the copy-to-device directory action in download box, page-source and other functionality.
   * Adjust set-default-protocol feature for newer Debian/Ubuntu versions.
