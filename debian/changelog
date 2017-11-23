@@ -1,3 +1,7 @@
+tunesviewer (2.0) stable; urgency=medium
+  * Final release
+ -- Luke Bryan <luke32j@msn.com>  Wed, 23 Nov 2017 04:17:00 -0000
+
 tunesviewer (1.99.4) beta; urgency=medium
   * Fix combobox pickers
   * Fix breaking download of items with slashes in the name
